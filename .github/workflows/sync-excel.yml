@@ -69,30 +69,30 @@ jobs:
           breed_sheet = wb["Breed Guide"]
 
           all_breeds = set()
-complex_breeds = set()
+         complex_breeds = set()
 
-for row in breed_sheet.iter_rows(values_only=True):
-    values = list(row) + [None, None]
+         for row in breed_sheet.iter_rows(values_only=True):
+             values = list(row) + [None, None]
 
-    breed = str(values[0] or "").strip()
-    complex_breed = str(values[1] or "").strip()
+             breed = str(values[0] or "").strip()
+             complex_breed = str(values[1] or "").strip()
 
-    if breed and breed.lower() not in {
-        "breed",
-        "all breeds",
-        "all fl breeds"
-    }:
-        all_breeds.add(breed)
+           if breed and breed.lower() not in {
+            "breed",
+            "all breeds",
+            "all fl breeds"
+        }:
+            all_breeds.add(breed)
 
-    if complex_breed and complex_breed.lower() not in {
-        "double coated",
-        "double-coated",
-        "double coated breeds",
-        "complex coat",
-        "complex coats"
-    }:
-        all_breeds.add(complex_breed)
-        complex_breeds.add(complex_breed)
+        if complex_breed and complex_breed.lower() not in {
+            "double coated",
+            "double-coated",
+            "double coated breeds",
+            "complex coat",
+            "complex coats"
+        }:
+            all_breeds.add(complex_breed)
+            complex_breeds.add(complex_breed)
 
 data = {
     "locations": locations,
