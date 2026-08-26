@@ -29,7 +29,7 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1f5f8f18
 .empty{margin-top:18px;text-align:center;background:#fff;border:1px dashed #cbd9e4;border-radius:15px;padding:28px;color:var(--muted)}
 .breed-page{display:none}.breed-page.show{display:block}.locator-page.hide{display:none}
 .breed-tools{display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:18px}.toggle{display:flex;align-items:center;gap:8px;font-weight:700;background:var(--sky);padding:0 14px;border-radius:9px}.toggle input{width:auto}
-.breed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.breed{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-weight:700}.breed.double{border-left:5px solid var(--orange)}
+.breed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.breed{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-weight:700}.breed.complex{border-left:5px solid var(--orange)}
 .legend{margin:12px 0;color:var(--muted);font-size:13px}.dot{display:inline-block;width:10px;height:10px;background:var(--orange);border-radius:50%;margin-right:5px}
 @media(max-width:800px){.search-grid,.locator-content,.breed-grid{grid-template-columns:1fr}.result.show{display:block}.result .card{margin-bottom:0}.breed-tools{grid-template-columns:1fr}.toggle{padding:12px}.wrap{padding:20px 12px}.brand h1{font-size:27px}}
 </style>
@@ -74,9 +74,9 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1f5f8f18
 <div class="panel">
 <div class="breed-tools">
 <input id="breedSearch" placeholder="Search breed...">
-<label class="toggle"><input type="checkbox" id="doubleOnly"> Double-coated only</label>
+<label class="toggle"><input type="checkbox" id="complexOnly"> Complex Coat only</label>
 </div>
-<div class="legend"><span class="dot"></span> Orange marker = double-coated breed</div>
+<div class="legend"><span class="dot"></span> Orange marker = Complex Coat breed</div>
 <div class="breed-grid" id="breedGrid"></div>
 </div>
 </section>
@@ -171,12 +171,13 @@ document.getElementById("resetMap").addEventListener("click",()=>{
 });
 setInterval(()=>{if(activeLoc)document.getElementById("hubTime").textContent=localTime(activeLoc)},1000);
 function renderBreeds(){
- const q=document.getElementById("breedSearch").value.toLowerCase().trim(), only=document.getElementById("doubleOnly").checked;
- const doubles=new Set(DATA.doubleBreeds.map(x=>x.toLowerCase()));
- const arr=DATA.allBreeds.filter(b=>(!q||b.toLowerCase().includes(q))&&(!only||doubles.has(b.toLowerCase())));
- document.getElementById("breedGrid").innerHTML=arr.map(b=>`<div class="breed ${doubles.has(b.toLowerCase())?"double":""}">${escapeHtml(b)}</div>`).join("")||'<div class="empty">No breeds found.</div>';
+ const q=document.getElementById("breedSearch").value.toLowerCase().trim(), only=document.getElementById("complexOnly").checked;
+ const complex=new Set((DATA.complexBreeds||DATA.doubleBreeds||[]).map(x=>x.toLowerCase()));
+ const breeds=[...new Set((DATA.allBreeds||[]).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+ const arr=breeds.filter(b=>(!q||b.toLowerCase().includes(q))&&(!only||complex.has(b.toLowerCase())));
+ document.getElementById("breedGrid").innerHTML=arr.map(b=>`<div class="breed ${complex.has(b.toLowerCase())?"complex":""}">${escapeHtml(b)}</div>`).join("")||'<div class="empty">No breeds found.</div>';
 }
-document.getElementById("breedSearch").addEventListener("input",renderBreeds);document.getElementById("doubleOnly").addEventListener("change",renderBreeds);
+document.getElementById("breedSearch").addEventListener("input",renderBreeds);document.getElementById("complexOnly").addEventListener("change",renderBreeds);
 document.getElementById("locatorTab").onclick=()=>{document.getElementById("locatorPage").classList.remove("hide");document.getElementById("breedPage").classList.remove("show");document.getElementById("locatorTab").classList.add("active");document.getElementById("breedTab").classList.remove("active");setTimeout(()=>map?.invalidateSize(),20)};
 document.getElementById("breedTab").onclick=()=>{document.getElementById("locatorPage").classList.add("hide");document.getElementById("breedPage").classList.add("show");document.getElementById("breedTab").classList.add("active");document.getElementById("locatorTab").classList.remove("active");renderBreeds()};
 window.addEventListener("load",async()=>{initMap();rebuildLocationIndex();renderBreeds();await loadWebsiteData()});
