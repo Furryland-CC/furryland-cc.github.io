@@ -68,41 +68,44 @@ jobs:
 
           breed_sheet = wb["Breed Guide"]
 
-          all_breeds = []
-          double_breeds = []
+          all_breeds = set()
+complex_breeds = set()
 
-          for row in breed_sheet.iter_rows(values_only=True):
-              values = list(row) + [None, None]
+for row in breed_sheet.iter_rows(values_only=True):
+    values = list(row) + [None, None]
 
-              breed = str(values[0] or "").strip()
-              double_breed = str(values[1] or "").strip()
+    breed = str(values[0] or "").strip()
+    complex_breed = str(values[1] or "").strip()
 
-              if breed and breed.lower() not in {
-                  "breed",
-                  "all breeds"
-              }:
-                  all_breeds.append(breed)
+    if breed and breed.lower() not in {
+        "breed",
+        "all breeds",
+        "all fl breeds"
+    }:
+        all_breeds.add(breed)
 
-              if double_breed and double_breed.lower() not in {
-                  "double coated",
-                  "double-coated",
-                  "double coated breeds"
-              }:
-                  double_breeds.append(double_breed)
+    if complex_breed and complex_breed.lower() not in {
+        "double coated",
+        "double-coated",
+        "double coated breeds",
+        "complex coat",
+        "complex coats"
+    }:
+        all_breeds.add(complex_breed)
+        complex_breeds.add(complex_breed)
 
-          data = {
-              "locations": locations,
-              "allBreeds": all_breeds,
-              "doubleBreeds": double_breeds
-          }
+data = {
+    "locations": locations,
+    "allBreeds": sorted(all_breeds),
+    "complexBreeds": sorted(complex_breeds)
+}
 
           with open("data.json", "w", encoding="utf-8") as f:
               json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
 
-          print(f"Exported {len(locations)} locations.")
-          print(f"Exported {len(all_breeds)} breeds.")
-          print(f"Exported {len(double_breeds)} double-coated breeds.")
-          PY
+         print(f"Exported {len(locations)} locations.")
+print(f"Exported {len(all_breeds)} breeds.")
+print(f"Exported {len(complex_breeds)} complex-coat breeds.")
 
       - name: Publish updated data
         run: |
